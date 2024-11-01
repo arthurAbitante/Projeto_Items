@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  # Backend (Node.js API)
+  backend:
+    build:
+      context: ./API
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./API:/app
+    depends_on:
+      - db
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: fiesc
+    command: npm start
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./FRONT/client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    volumes:
+      - ./FRONT/client:/app
+    depends_on:
+      - backend
+
+  # PostgreSQL Database
+  db:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: fiesc
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
